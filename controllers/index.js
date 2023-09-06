@@ -12,7 +12,17 @@ mainRouter.get("/generateNames",(req,res)=>{
     const processEnd = processStart + 50;
     let nameLimiter = nameDataset.slice(processStart, processEnd);
     nameLimiter.forEach((item)=>{
-        names = names + item.people_name + "<br/>";
+        let rowData = "";
+        if (Object.keys(item).indexOf("people_name") !== -1) {
+            rowData = rowData + item["people_name"] + ","
+        }
+        if (Object.keys(item).indexOf("email_address") !== -1) {
+            rowData = rowData + item["email_address"] + ","
+        }
+        if (Object.keys(item).indexOf("mobile_number") !== -1) {
+            rowData = rowData + item["mobile_number"] + ","
+        }
+        names = names + rowData + "<br/>";
     })
     res.status(200).send(names);
 })
