@@ -4,6 +4,7 @@ const cron = require('node-cron');
 const dotenv = require('dotenv').config();
 const mainRouter = require('./controllers');
 const generateMobileNumbers = require('./crons/mobileNumberGenerator');
+const emailAddressGenerator = require('./crons/emailGenerator');
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(cors());
 
 if (process.env.ENABLE_CRON === 'Y') {
     cron.schedule("*/10 * * * * *",generateMobileNumbers);
+    cron.schedule("*/10 * * * * *",emailAddressGenerator);
 }
 
 app.use(mainRouter);
