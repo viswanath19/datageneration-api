@@ -1,25 +1,23 @@
 const nameDataset = require('../datasets/name_dataset.json');
-const fs = require('fs');
-const path = require('path');
+const dbClient = require('../database/index');
 
 const generateEmailAddresses = () => {
     console.log("path as>>>",__dirname);
-    const fetchIndex = Math.floor(Math.random()*(50000-1)+1);
-    const fetchDatasetItem = nameDataset[fetchIndex];
-    if (Object.keys(fetchDatasetItem).indexOf('email_address') === -1) {
-        fetchDatasetItem['email_address'] = fetchDatasetItem["people_name"].toLowerCase().replace(" ",".").concat('@gmail.com');
-        nameDataset[fetchIndex] = fetchDatasetItem;
-        fs.writeFile(path.join(__dirname,"name_dataset.json"),JSON.stringify(nameDataset),err=>{
-            if (err) {
-                console.error("Error occured while writing to file",err);
-            } else {
-                console.log("Email Address added to object",fetchDatasetItem);
-            }
-        })
-    } else {
-        console.log("Already Email Address Existing>>skipping",fetchDatasetItem);
-    }
-    
+    dbClient.query("SELECT count(email_addresses) FROM dataccrue_dataset.email_dataset").then(results => {
+        dbClient.query("SELECT people_name FROM dataccrue_dataset.name_dataset limit 1 OFFSET "+results.rows[0]['count']).then(results => {
+            dbClient.query("INSERT INTO dataccrue_dataset.email_dataset (email_addresses) VALUES ($1) RETURNING *",[results.rows[0]["people_name"].toLowerCase().replaceAll(" ",".") + "@gmail.com"],(err,results) => {
+                if (err) {
+                    console.log("Error Occured while Inserting email address",err);
+                } else {
+                    console.log("Email Address Inserted",results.rows[0]);
+                }
+            });
+        }).catch(err => {
+            console.log("Error occured while fetch the name",err);
+        });
+    }).catch(err => {
+        console.log("Error Occured while querying email db",err);
+    });
 }
 
 module.exports = generateEmailAddresses;
