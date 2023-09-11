@@ -3,7 +3,6 @@ const cors = require('cors');
 const cron = require('node-cron');
 const dotenv = require('dotenv').config();
 const mainRouter = require('./controllers');
-const dbClient = require('./database/index');
 const generateMobileNumbers = require('./crons/mobileNumberGenerator');
 const emailAddressGenerator = require('./crons/emailGenerator');
 
