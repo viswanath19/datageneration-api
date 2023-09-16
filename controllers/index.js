@@ -15,17 +15,28 @@ mainRouter.get("/generateNames",async (req,res)=>{
     }).catch(err => {
         console.log("Error Occured While Fetching in Names db",err);
     });
-    const fetchEmails = await dbClient.query("SELECT email_addresses FROM dataccrue_dataset.email_dataset limit 50").then(results => {
-        console.log("results as follows from emails db",results.rowCount);
-        return results.rows;
+    const fetchEmails = await dbClient.query("SELECT count(*) FROM dataccrue_dataset.email_dataset").then(results => {
+        const offset = Math.floor(Math.random()*(results.rows[0]['count']-1)+1);
+        dbClient.query("SELECT email_addresses FROM dataccrue_dataset.email_dataset limit 50 OFFSET "+offset).then(results => {
+            console.log("results as follows from emails db",results.rowCount);
+            return results.rows;
+        }).catch(err => {
+            console.log("Error Occured While Fetching in emails db",err);
+        });
     }).catch(err => {
-        console.log("Error Occured While Fetching in emails db",err);
-    });
-    const fetchPhoneNumbers = await dbClient.query("SELECT mobile_numbers FROM dataccrue_dataset.phone_dataset limit 50").then(results => {
-        console.log("results as follows from phones db",results.rowCount);
-        return results.rows;
+        console.log("Error Occured While Fetching in emails db counts",err);
+    })
+    
+    const fetchPhoneNumbers = await dbClient.query("SELECT count(*) FROM dataccrue_dataset.phone_dataset").then(results => {
+        const offset = Math.floor(Math.random()*(results.rows[0]['count']-1)+1);
+        dbClient.query("SELECT mobile_numbers FROM dataccrue_dataset.phone_dataset limit 50 OFFSET "+offset).then(results => {
+            console.log("results as follows from phones db",results.rowCount);
+            return results.rows;
+        }).catch(err => {
+            console.log("Error Occured While Fetching in Phones db",err);
+        });
     }).catch(err => {
-        console.log("Error Occured While Fetching in Phones db",err);
+        console.log("Error Occured While Fetching in phone db counts",err);
     });
     if (fetchNames !== null && fetchNames.length > 0) {
         fetchNames.forEach((rowItem,index) => {
