@@ -10,6 +10,8 @@ const app = express();
 
 app.use(cors());
 
+app.use(express.json());
+
 if (process.env.ENABLE_CRON === 'Y') {
     cron.schedule(process.env.CRON_INTERVAL,generateMobileNumbers);
     cron.schedule(process.env.CRON_INTERVAL,emailAddressGenerator);
